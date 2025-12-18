@@ -59,30 +59,40 @@ else:
 # ==========================================
 # 4. GENERACIÓN DE GRÁFICAS (Visualización)
 # ==========================================
-# Configuramos el estilo de las gráficas
+
 sns.set_style("whitegrid")
 
-# --- GRÁFICA A: HISTOGRAMA COMPARATIVO ---
+# --- VENTANA 1: HISTOGRAMA ---
 plt.figure(figsize=(10, 6))
-sns.histplot(data=df, x='Ping', hue='Conexion', kde=True, bins=10, palette=['orange', 'blue'])
+
+sns.histplot(
+    data=df,
+    x='Ping',
+    hue='Conexion',
+    kde=True,
+    bins=10,
+    palette=['orange', 'blue']
+)
 
 plt.title('Comparación de Frecuencias: WiFi llega a pings más altos')
 plt.xlabel('Ping (ms) - Hacia la derecha es más lento')
 plt.ylabel('Frecuencia (Cantidad de veces)')
 
-# Guardar imagen
-plt.savefig("1_histograma_comparativo.png")
-print("\nGráfica 1 guardada como: '1_histograma_comparativo.png'")
-plt.clf() # Limpiamos la memoria para la siguiente gráfica
+plt.show()  # PRIMERA VENTANA
 
-# --- GRÁFICA B: BOXPLOT (CAJA Y BIGOTES) ---
+# --- VENTANA 2: BOXPLOT ---
 plt.figure(figsize=(8, 5))
 
-sns.boxplot(data=df, x='Conexion', y='Ping', palette=['orange', 'blue'])
+sns.boxplot(
+    data=df,
+    x='Conexion',
+    y='Ping',
+    hue='Conexion',
+    legend=False,
+    palette=['orange', 'blue']
+)
 
 plt.title('Rango de Estabilidad (Menos es mejor)')
 plt.ylabel('Ping (ms)')
 
-# Guardar imagen
-plt.savefig("2_boxplot_rangos.png")
-print("Gráfica 2 guardada como: '2_boxplot_rangos.png'")
+plt.show()  # SEGUNDA VENTANA
