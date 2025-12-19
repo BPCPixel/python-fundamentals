@@ -1,5 +1,7 @@
-# Generator system of emails
+# Email Generator System
 # This is a new version of the generator email system
+# This program asks for user data and generates an email address automatically
+
 
 print(f'{"="*20} Email Generator System {"="*20}')
 
