@@ -19,7 +19,7 @@ normalized_name = name.lower().replace(" ",".")
 normalized_company = company.lower().replace(" ","-")
 normalized_city = city.upper()
 
-# Generate
+# Generate data
 domain = f'@{normalized_company}-{normalized_city}.com.mx'
 email = normalized_name + domain
 employee_ID =f'{len(normalized_name)}{normalized_name[:3]}{normalized_company}'
