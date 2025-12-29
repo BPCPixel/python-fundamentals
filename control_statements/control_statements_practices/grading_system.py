@@ -1,4 +1,11 @@
-# This code simulates a system where it transforms a numeric grade to an alphabetical grade
+"""
+Grading System
+
+This program converts a numeric grade (0-10) into an alphabetical grade.
+It validates user input and assigns a letter grade using conditional logic.
+
+Author: Lalo Tellez
+"""
 
 print(f'{"=" * 20} Grading System {"=" * 20}\n')
 
