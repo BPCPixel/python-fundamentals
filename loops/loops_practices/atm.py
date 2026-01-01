@@ -27,26 +27,24 @@ while is_running:
         print(f'Balance: ${balance:.2f}\n')
 
     elif option == 2:
-        print(f'\nCurrent balance: ${balance:.2f}')
 
+        # If the user has insufficient funds it won't perform
         if balance == 0:
             print("Insufficient funds to perform a withdrawal.\n")
         else:
             withdraw = float(input('Enter the amount you would like to withdraw: $'))
-
+            
+            # Validation
             if withdraw > balance:
                 print("The amount you want to withdraw is greater than your current balance.\n")
             else:
                 balance -= withdraw
                 print('\nTransaction successful.')
-                print(f'Current balance: ${balance:.2f}\n')
 
     elif option == 3:
-        print(f'\nCurrent balance: ${balance:.2f}')
         deposit = float(input('Enter the amount you would like to deposit: $'))
         balance += deposit
         print('\nTransaction successful.')
-        print(f'Current balance: ${balance:.2f}\n')
 
     elif option == 4:
         print('Exiting the system...\n')
