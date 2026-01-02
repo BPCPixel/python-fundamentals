@@ -24,58 +24,42 @@ while is_running:
     6. Exit''')
     option = int(input('Option: '))
     
-    if option == 1:
+    if 1 <= option <= 5:
         value_1 = float(input('\nEnter the first value: '))
         value_2 = float(input('Enter the second value: '))
+    
+        if option == 1:
+            result = value_1 + value_2
         
-        # Calculating the addition of both values
-        result = value_1 + value_2
-        
-        # Output with the answer
-        print(f'{value_1} + {value_2} = {result}\n')
+            print(f'{value_1} + {value_2} = {result}\n')
 
-    elif option == 2:
-        value_1 = float(input('\nEnter the first value: '))
-        value_2 = float(input('Enter the second value: '))
+        elif option == 2:
+            result = value_1 - value_2
         
-        # Calculating the substraction of both values
-        result = value_1 - value_2
+            print(f'{value_1} - {value_2} = {result:.2f}\n')
         
-        # Output with the answer
-        print(f'{value_1} - {value_2} = {result:.2f}\n')
+        elif option == 3:
+            result = value_1 * value_2
         
-    elif option == 3:
-        value_1 = float(input('\nEnter the first value: '))
-        value_2 = float(input('Enter the second value: '))
+            print(f'{value_1} * {value_2} = {result:.2f}\n')
         
-        # Calculating the multiplication of both values
-        result = value_1 * value_2
+        elif option == 4:
         
-        # Output with the answer
-        print(f'{value_1} * {value_2} = {result:.2f}\n')
+            if value_2 == 0:
+                print('Error: Division by zero it not allowed\n')
+            else:
+                result = value_1 / value_2
+                print(f'{value_1} / {value_2} = {result:.2f}\n')
         
-    elif option == 4:
-        value_1 = float(input('\nEnter the first value: '))
-        value_2 = float(input('Enter the second value: '))
+        elif option == 5:
         
-        if value_2 == 0:
-            print('Error: Division by zero it not allowed\n')
-        else:
-            result = value_1 / value_2
-            # Output with the answer
-            print(f'{value_1} / {value_2} = {result:.2f}\n')
-        
-    elif option == 5:
-        value_1 = float(input('\nEnter the first value: '))
-        value_2 = float(input('Enter the second value: '))
-        
-        if value_2 == 0:
-            print('Error: Division by zero it not allowed\n')
-        else:
-            result = value_1 // value_2
-            # Output with the answer
-            print(f'{value_1} // {value_2} = {result:.2f}\n')
-        
+            if value_2 == 0:
+                print('Error: Division by zero it not allowed\n')
+            else:
+                result = value_1 // value_2
+                # Output with the answer
+                print(f'{value_1} // {value_2} = {result:.2f}\n')
+                
     elif option == 6:
         print("\nClosing calculator...")
         is_running = False
