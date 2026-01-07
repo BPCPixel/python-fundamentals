@@ -1,23 +1,22 @@
 """
-This is an Udemy Test where I need to print just the number of vowels in a string.
+Udemy Test: Count Vowels in a String
 
-Author: Lalo Téllez
+This program counts and prints the number of vowels in a string.
+
+Author: Lalo Tellez
 """
 
-# Declarar la variable
-cadena = 'Hola Mundo'.lower()
-# Agregar el ciclo for
-contador = 0
-for i in cadena:
-    if i == 'a':
-        contador += 1
-    elif i == 'e':
-        contador += 1
-    elif i == 'i':
-        contador += 1
-    elif i == 'o':
-        contador += 1
-    elif i == 'u':
-        contador += 1
-# Imprimir la cantidad de vocales encontradas en la cadena
-print(contador)
+# Declare the string and convert it to lowercase
+text = 'Hola Mundo'.lower()
+
+vowels = 'aeiou'
+
+# Initialize the vowel counter
+vowel_count = 0
+
+for char in text:
+    if char in vowels:
+        vowel_count += 1
+
+# Print the number of vowels found in the string
+print(vowel_count)
