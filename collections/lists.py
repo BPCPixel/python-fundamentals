@@ -1,6 +1,6 @@
 """
 Example
-This program demonstrates basic list syntax in Python.
+This program demonstrates basic list syntax and common list operations in Python.
 
 Author: Lalo Tellez
 """
@@ -25,8 +25,21 @@ print(f'{my_list} -> Original list\n')
 print(f'List Length: {len(my_list)}\n')
 
 # Accessing list items by index
-print(f'Index [4]: {my_list[4]}')         # 50
-print(f'Last element: {my_list[-1]}')     # 50
+print(f'Index [4]: {my_list[4]}')          # 50
+print(f'Last element: {my_list[-1]}')      # 50
 print(f'Penultimate element: {my_list[-2]}')  # 40
+
+# Modifying list elements
+my_list[1] = 200
+print(f'\nElement at index [1] was modified: {my_list[1]}\n')
+
+# Add a new element at the end of the list using append()
+my_list.append(60)
+print(f'{my_list} -> Element [60] was added at the end of the list\n')
+
+# Add a new element at a specific index using insert()
+my_list.insert(2, 150)
+print(f'Element {my_list[2]} was added at index 2\n')
+print(my_list)
 
 print(f'\n{"=" * 50}')
