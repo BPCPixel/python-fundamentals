@@ -39,7 +39,26 @@ print(f'{my_list} -> Element [60] was added at the end of the list\n')
 
 # Add a new element at a specific index using insert()
 my_list.insert(2, 150)
-print(f'Element {my_list[2]} was added at index 2\n')
+print(f'Element {my_list[2]} was added at index 2')
 print(my_list)
+
+# Remove list elements using remove method
+my_list.remove(50)
+print('\nRemove Method')
+print(f'{my_list} -> 5 value was removed')
+
+# Remove element by index with pop method
+my_list.pop(1)
+print('\nRemove index[1] with pop method')
+print(f'{my_list} index [1] was removed')
+
+# Remove element using word "del"
+del my_list[2]
+print('\nRemove index[2] with word "del"')
+print(f'{my_list} index [2] was removed')
+
+# Obtaining sublists
+sublist = my_list[1:3] # 1 and 2
+print(f'\nSublist[1:3]: {sublist}')
 
 print(f'\n{"=" * 50}')
