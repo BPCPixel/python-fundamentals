@@ -1,77 +1,122 @@
 """
-RAM Assignation simulation by Operating System.
-Author: Lalo Téllez
+Simulación de asignación de RAM por el Sistema Operativo.
+
+Autor: Lalo Téllez
 """
 import random
 
-print(f'{"*" * 20} RAM Simulation {"*" * 20}')
+print(f'{"=" * 20} Simulación de RAM {"=" * 20}')
 
+# Inicializamos la RAM con espacios vacíos
+tamano_ram = int(input('Escribe el tamaño de la RAM: '))
+lista_principal = []
+for i in range(tamano_ram):
+    lista_principal.append("-")
 
+# Listas para guardar la información de los procesos (PCBs)
+pcb_pids = []
+pcb_nombres = []
+pcb_tamanos = []
+pcb_estados = []
 
-automatic_PID = 0
+pid_automatico = 0
+salir = False
 
-out_option = None
+while salir != True:
+    opcion = int(input(f'''
+{"-" * 5} MENÚ DE USUARIO {"-" * 5}
+1. Crear procesos
+2. Eliminar procesos
+3. Buscar procesos
+4. Visualizar procesos en RAM
+5. Salir
+OPCIÓN: '''))
 
-automatic_state = None
-
-process_name = f'No Name Yet'
-process_size = 0
-
-name_list_increment = 0
-name_list = []
-
-# User menu
-while out_option != True:
-    option = int(input(f'''
-{"-" * 5} USER MENU {"-" * 5}
-Enter an option
-1. Create processes
-2. Delete processes
-3. Search processes
-4. Visualize RAM processes
-5. Exit
-OPTION: '''))
-
-    if option == 1:
-
-        print(f'\n{"-" * 5}Crating processes {"-" * 5}')
+    if opcion == 1:
+        print(f'\n{"-" * 5} Creando proceso {"-" * 5}')
+        nombre_proceso = input('Escribe el nombre del proceso (se recomienda 1 caracter): ')
         
-        process_name = input('Type the name of the procces: ')
-        
-        if process_name in (name_list):
-            print('You should pick another name: ')
-        else:  
-            name_list.insert(name_list_increment, process_name)
-            name_list_increment += 1
-            
-        process_size = int(input('Type the size of the procces: '))
-        automatic_PID += 1
-        random_value = random.randint(1,3)
-
-        if random_value == 1:
-            automatic_state = f'READY\n'
-        elif automatic_state == 2:
-            automatic_state = f'EXECUTE\n'
+        if nombre_proceso in pcb_nombres:
+            print('Error: El nombre del proceso ya existe.')
         else:
-            automatic_state = f'WAIT\n'
-        bytes_size = int(input('Type the size of RAM: '))
+            tamano_proceso = int(input('Escribe el tamaño del proceso: '))
+            
+            # Contar espacios libres en la RAM
+            espacio_libre = 0
+            for celda in lista_principal:
+                if celda == "-":
+                    espacio_libre += 1
+            
+            if tamano_proceso <= espacio_libre:
+                # Insertar en los primeros espacios libres que encuentre
+                contador = 0
+                for i in range(tamano_ram):
+                    if lista_principal[i] == "-" and contador < tamano_proceso:
+                        lista_principal[i] = nombre_proceso
+                        contador += 1
+                
+                # Guardar datos del PCB
+                pid_automatico += 1
+                pcb_pids.append(pid_automatico)
+                pcb_nombres.append(nombre_proceso)
+                pcb_tamanos.append(tamano_proceso)
+                
+                # Estado aleatorio
+                r = random.randint(1, 3)
+                if r == 1: estado = "LISTO"
+                elif r == 2: estado = "EJECUCIÓN"
+                else: estado = "ESPERA"
+                pcb_estados.append(estado)
+                
+                print(f'Proceso {nombre_proceso} creado exitosamente.')
+            else:
+                print('¡No hay suficiente espacio en la RAM!')
+
+    elif opcion == 2:
+        print(f'\n{"-" * 5} Eliminar proceso {"-" * 5}')
+        nombre_eliminar = input('Escribe el nombre del proceso a eliminar: ')
         
-    elif option == 2:
-        print(f'\nOPTION 2')
-    elif option == 3:
-        print(f'\nOPTION 3')
+        if nombre_eliminar in pcb_nombres:
+            # 1. Borrar de la RAM (volver a poner '-')
+            for i in range(tamano_ram):
+                if lista_principal[i] == nombre_eliminar:
+                    lista_principal[i] = "-"
+            
+            # 2. Borrar de las listas de datos (PCB)
+            indice = pcb_nombres.index(nombre_eliminar)
+            pcb_pids.pop(indice)
+            pcb_nombres.pop(indice)
+            pcb_tamanos.pop(indice)
+            pcb_estados.pop(indice)
+            print(f'Proceso {nombre_eliminar} eliminado.')
+        else:
+            print('Proceso no encontrado.')
+
+    elif opcion == 3:
+        print(f'\n{"-" * 5} Buscar proceso {"-" * 5}')
+        busqueda = input('Buscar por PID o Nombre: ')
         
-    elif option == 4:
-        print(f'\n{"-" * 5} Visualize RAM processes {"-" * 5}')
+        encontrado = False
+        for i in range(len(pcb_nombres)):
+            # Comparamos con el nombre o con el PID (convertido a texto)
+            if busqueda == pcb_nombres[i] or busqueda == str(pcb_pids[i]):
+                print(f'Encontrado -> PID: {pcb_pids[i]}, Nombre: {pcb_nombres[i]}, Tamaño: {pcb_tamanos[i]}, Estado: {pcb_estados[i]}')
+                encontrado = True
+        if not encontrado:
+            print('Proceso no encontrado.')
+
+    elif opcion == 4:
+        print(f'\n{"-" * 5} Visualizar RAM {"-" * 5}')
+        # Mostrar el mapa de la RAM
+        print(f'Estado de la RAM: {lista_principal}')
         
-        print(f'''RAM:
-PID: {automatic_PID}
-Proccess Name: {process_name}
-Size of the progress: {process_size}
-STATE: {automatic_state}''')
-    
-    elif option == 5:
-        print(f'\nOPTION 5')
-        out_option = True
-    else:
-        print('\nInvalid option, try again ...')
+        # Mostrar la lista de procesos activos
+        print('\nProcesos Activos (PCB):')
+        for i in range(len(pcb_nombres)):
+            print(f'PID: {pcb_pids[i]} | Nombre: {pcb_nombres[i]} | Tamaño: {pcb_tamanos[i]} | Estado: {pcb_estados[i]}')
+
+    elif opcion == 5:
+        print('Saliendo del programa...')
+        salir = True
+        
+print(f'{"=" * 50}')
