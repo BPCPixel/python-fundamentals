@@ -19,6 +19,5 @@ for i in range(n-2):
     a = b
     b = c
     
-    
 
 print(f'\n{"=" * 50}')
