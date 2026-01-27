@@ -1,17 +1,14 @@
 """
-Simulación de asignación de RAM por el Sistema Operativo pero ahora con matrices.
-
-Autor: Lalo Téllez
+Simulación de RAM con MATRICES.
+Autor: Lalo Téllez 
 """
 import random
 
-print(f'{"=" * 20} Simulación de RAM (Matrices) {"=" * 20}')
+print(f'{"=" * 20} Simulación de RAM Contigua {"=" * 20}')
 
-# Inicializamos la RAM como matriz
-filas = int(input('Escribe el número de filas de la RAM: '))
-columnas = int(input('Escribe el número de columnas de la RAM: '))
+filas = int(input('Escribe el número de filas: '))
+columnas = int(input('Escribe el número de columnas: '))
 
-# Creamos la matriz llena de "-"
 matriz_ram = []
 for f in range(filas):
     fila_nueva = []
@@ -19,7 +16,6 @@ for f in range(filas):
         fila_nueva.append("-")
     matriz_ram.append(fila_nueva)
 
-# Listas para guardar la información de los procesos (PCBs)
 pcb_pids = []
 pcb_nombres = []
 pcb_tamanos = []
@@ -30,99 +26,88 @@ salir = False
 
 while salir != True:
     opcion = int(input(f'''
-{"-" * 5} MENÚ DE USUARIO {"-" * 5}
-1. Crear procesos
-2. Eliminar procesos
-3. Buscar procesos
-4. Visualizar procesos en RAM (Matriz)
+{"-" * 5} MENÚ {"-" * 5}
+1. Crear proceso
+2. Eliminar proceso
+3. Buscar proceso
+4. Visualizar RAM
 5. Salir
 OPCIÓN: '''))
 
     if opcion == 1:
-        print(f'\n{"-" * 5} Creando proceso {"-" * 5}')
-        nombre_proceso = input('Escribe el nombre del proceso: ')
-        
+        nombre_proceso = input('Nombre del proceso: ')
         if nombre_proceso in pcb_nombres:
-            print('Error: El nombre del proceso ya existe.')
+            print('Error: El nombre ya existe.')
         else:
-            tamano_proceso = int(input('Escribe el tamaño del proceso (unidades): '))
+            tamano_proceso = int(input('Tamaño del proceso: '))
             
-            # Contar espacios libres en la MATRIZ
-            espacio_libre = 0
-            for f in range(filas):
-                for c in range(columnas):
-                    if matriz_ram[f][c] == "-":
-                        espacio_libre += 1
+            # Se busca un bloque
+            inicio_encontrado = -1
+            capacidad_total = filas * columnas
             
-            if tamano_proceso <= espacio_libre:
-                # Insertar en los espacios libres
-                contador = 0
-                for f in range(filas):
-                    for c in range(columnas):
-                        if matriz_ram[f][c] == "-" and contador < tamano_proceso:
-                            matriz_ram[f][c] = nombre_proceso
-                            contador += 1
+            # Recorremos la RAM como si fuera una sola línea larga
+            for i in range(capacidad_total - tamano_proceso + 1):
+                es_posible = True
+                for j in range(tamano_proceso):
+                    
+                    f_temp = (i + j) // columnas
+                    c_temp = (i + j) % columnas
+                    
+                    if matriz_ram[f_temp][c_temp] != "-":
+                        es_posible = False
+                        break
                 
-                # Guardar datos del PCB
+                if es_posible:
+                    inicio_encontrado = i
+                    break
+            
+            if inicio_encontrado != -1:
+                # Insertar el proceso en el bloque
+                for k in range(tamano_proceso):
+                    f_pos = (inicio_encontrado + k) // columnas
+                    c_pos = (inicio_encontrado + k) % columnas
+                    matriz_ram[f_pos][c_pos] = nombre_proceso
+                
                 pid_automatico += 1
                 pcb_pids.append(pid_automatico)
                 pcb_nombres.append(nombre_proceso)
                 pcb_tamanos.append(tamano_proceso)
                 
-                r = random.randint(1, 3)
-                if r == 1: estado = "LISTO"
-                elif r == 2: estado = "EJECUCIÓN"
-                else: estado = "ESPERA"
-                pcb_estados.append(estado)
-                
-                print(f'Proceso {nombre_proceso} creado exitosamente.')
+                estados_posibles = ["LISTO", "EJECUCIÓN", "ESPERA"]
+                pcb_estados.append(random.choice(estados_posibles))
+                print(f'Proceso {nombre_proceso} asignado')
             else:
-                print('¡No hay suficiente espacio en la RAM!')
+                print('Error: No se encontró un bloque suficiente.')
 
     elif opcion == 2:
-        print(f'\n{"-" * 5} Eliminar proceso {"-" * 5}')
-        nombre_eliminar = input('Escribe el nombre del proceso a eliminar: ')
-        
+        nombre_eliminar = input('Proceso a eliminar: ')
         if nombre_eliminar in pcb_nombres:
-            # 1. Borrar de la MATRIZ
             for f in range(filas):
                 for c in range(columnas):
                     if matriz_ram[f][c] == nombre_eliminar:
                         matriz_ram[f][c] = "-"
-            
-            # 2. Borrar del PCB
             indice = pcb_nombres.index(nombre_eliminar)
-            pcb_pids.pop(indice)
-            pcb_nombres.pop(indice)
-            pcb_tamanos.pop(indice)
-            pcb_estados.pop(indice)
-            print(f'Proceso {nombre_eliminar} eliminado.')
+            pcb_pids.pop(indice); pcb_nombres.pop(indice)
+            pcb_tamanos.pop(indice); pcb_estados.pop(indice)
+            print('Proceso eliminado.')
         else:
-            print('Proceso no encontrado.')
+            print('No encontrado.')
 
     elif opcion == 3:
-        print(f'\n{"-" * 5} Buscar proceso {"-" * 5}')
-        busqueda = input('Buscar por PID o Nombre: ')
+        busqueda = input('PID o Nombre: ')
         encontrado = False
         for i in range(len(pcb_nombres)):
             if busqueda == pcb_nombres[i] or busqueda == str(pcb_pids[i]):
-                print(f'Encontrado -> PID: {pcb_pids[i]}, Nombre: {pcb_nombres[i]}, Tamaño: {pcb_tamanos[i]}, Estado: {pcb_estados[i]}')
+                print(f'PID: {pcb_pids[i]}, Nombre: {pcb_nombres[i]}, Tam: {pcb_tamanos[i]}, Estado: {pcb_estados[i]}')
                 encontrado = True
-        if not encontrado:
-            print('Proceso no encontrado.')
+        if not encontrado: print('No encontrado.')
 
     elif opcion == 4:
-        print(f'\n{"-" * 5} Visualizar RAM {"-" * 5}')
-        # Mostrar la MATRIZ de forma visual
+        print(f'\nMapa de Memoria ({filas}x{columnas}):')
         for f in range(filas):
-            print(matriz_ram[f]) # Imprime cada fila
-        
-        print('\nProcesos Activos (PCB):')
-        for i in range(len(pcb_nombres)):
-            print(f'PID: {pcb_pids[i]} | Nombre: {pcb_nombres[i]} | Tamaño: {pcb_tamanos[i]} | Estado: {pcb_estados[i]}')
+            print(f"{matriz_ram[f]}")
 
     elif opcion == 5:
-        print('Saliendo del programa...')
         salir = True
-        
+
 print(f'{"=" * 50}')
