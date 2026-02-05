@@ -28,7 +28,7 @@ RAM Total: {tamano_ram_kb}KB | Marcos: {total_bloques} de {tamano_marco_kb}KB
 1. Crear proceso
 2. Eliminar proceso (PID o Nombre)
 3. Buscar proceso (PID, Nombre, Marco o Página)
-4. Visualizar RAM y PCB
+4. Visualizar RAM
 5. Salir
 OPCIÓN: '''))
 
