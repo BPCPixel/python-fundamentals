@@ -40,11 +40,11 @@ OPCIÓN: '''))
             print('Error: El nombre ya existe.')
         else:
             tamano_solicitado = int(input('Tamaño del proceso en KB: '))
+            
             # Calcular cuántos marcos necesita (Redondeo hacia arriba)
-            # Ejemplo: 6KB / 4KB = 1.5 -> Necesita 2 marcos
             marcos_necesarios = (tamano_solicitado + tamano_marco_kb - 1) // tamano_marco_kb
             
-            # --- LÓGICA DE BÚSQUEDA BEST-FIT (El mejor ajuste) ---
+            # BEST-FIT (El mejor ajuste)
             mejor_inicio = -1
             mejor_tamano_hueco = total_bloques + 1
             
@@ -57,7 +57,6 @@ OPCIÓN: '''))
                         tamano_hueco += 1
                         i += 1
                     
-                    # ¿Cabe el proceso y es el hueco más pequeño que hemos visto?
                     if tamano_hueco >= marcos_necesarios and tamano_hueco < mejor_tamano_hueco:
                         mejor_tamano_hueco = tamano_hueco
                         mejor_inicio = inicio_hueco
@@ -71,7 +70,6 @@ OPCIÓN: '''))
                     lista_principal[posicion] = nombre
                     indices_asignados.append(posicion)
                 
-                # Guardar en PCB
                 pid_automatico += 1
                 pcb_pids.append(pid_automatico)
                 pcb_nombres.append(nombre)
@@ -87,7 +85,6 @@ OPCIÓN: '''))
         dato = input('Escribe el PID o Nombre a eliminar: ')
         indice_pcb = -1
         
-        # Buscar el índice en el PCB
         for i in range(len(pcb_nombres)):
             if dato == pcb_nombres[i] or dato == str(pcb_pids[i]):
                 indice_pcb = i
