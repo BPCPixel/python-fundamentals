@@ -2,21 +2,21 @@ import random
 
 print(f'\n{"=" * 20} SimuRAM: Proyecto Final {"=" * 20}\n')
 
-# 1) Configuración de Hardware [cite: 4, 5]
+# 1) Configuración de Hardware 
 tamano_ram_kb = int(input('1) Escribe el tamaño de la RAM (KB): '))
 tamano_marco_kb = int(input('2) Escribe el tamaño del marco (KB): '))
 tamano_marco_bytes = tamano_marco_kb * 1024
 total_bloques = tamano_ram_kb // tamano_marco_kb
 
-# Inicialización de vectores [cite: 14, 30]
+# Inicialización de vectores 
 lista_ram = ["-" for _ in range(total_bloques)]
 lista_vram = ["-" for _ in range(total_bloques)]
 
-# PCB y Control [cite: 8, 16]
+# PCB y Control
 pcb_pids = []
 pcb_paginas_info = [] 
-pcb_ubicacion = [] # 'RAM' o 'VRAM' [cite: 30, 32]
-pcb_estados = []   # X (Ejecución), R (Ready), W (Wait), E (End) [cite: 40, 49]
+pcb_ubicacion = [] # 'RAM' o 'VRAM'
+pcb_estados = []   # X (Ejecución), R (Ready), W (Wait), E (End)
 pid_automatico = 1 
 contador_paginas_global = 0
 
@@ -124,14 +124,14 @@ while not salir:
             print(f"\n{'='*10} INICIANDO CICLO {ciclo + 1} {'='*10}")
             i = 0
             while i < len(pcb_pids):
-                # REPORTES PARA PROCESOS EN RAM [cite: 30, 32]
+                # REPORTES PARA PROCESOS EN RAM
                 if pcb_ubicacion[i] == 'RAM':
-                    if random.random() < 0.30: # Probabilidad de cambio de estado [cite: 38, 41]
+                    if random.random() < 0.30: # Probabilidad de cambio de estado
                         sub = random.random()
-                        if sub < 0.60: # 60% a Ready (R) [cite: 40]
+                        if sub < 0.60: # 60% a Ready (R)
                             print(f"[EVENTO] PID {pcb_pids[i]}: Cambió de X -> R (Listo).")
                             pcb_estados[i] = 'R'
-                        elif sub < 0.80: # 20% a Wait (W) - Mover a VRAM [cite: 40, 48]
+                        elif sub < 0.80: # 20% a Wait (W) - Mover a VRAM
                             m_nec = len(pcb_paginas_info[i])
                             ini_v = -1
                             for v in range(total_bloques - m_nec + 1):
@@ -145,13 +145,13 @@ while not salir:
                                     pcb_paginas_info[i][k]["marco"] = ini_v + k
                                 pcb_ubicacion[i] = 'VRAM'; pcb_estados[i] = 'W'
                             else: print(f"[AVISO] PID {pcb_pids[i]}: No hay espacio en VRAM.")
-                        else: # 20% a End (E) [cite: 40, 49]
+                        else: # 20% a End (E) 
                             print(f"[EVENTO] PID {pcb_pids[i]}: Ha finalizado su ejecución (E).")
                             for pag in pcb_paginas_info[i]: lista_ram[pag["marco"]] = "-"
                             pcb_pids.pop(i); pcb_paginas_info.pop(i); pcb_ubicacion.pop(i); pcb_estados.pop(i)
                             continue
                     else:
-                        pcb_estados[i] = 'X' # 70% sigue en Ejecución [cite: 37]
+                        pcb_estados[i] = 'X' # 70% sigue en Ejecución
                         # Gestión de errores por página 
                         for pag in pcb_paginas_info[i]:
                             if random.random() < 0.30: 
@@ -161,10 +161,10 @@ while not salir:
                                 print(f"[SUSTITUCIÓN] PID {pcb_pids[i]} - Pág {pag['id_p']}: Generar nueva pág y aviso.")
                                 pag["errores"] = 0
                 
-                # REPORTES PARA PROCESOS EN VRAM [cite: 32, 48]
+                # REPORTES PARA PROCESOS EN VRAM 
                 elif pcb_ubicacion[i] == 'VRAM':
                     sub_prob = random.random()
-                    if sub_prob < 0.60: # 60% intenta subir a RAM (R) [cite: 42]
+                    if sub_prob < 0.60: # 60% intenta subir a RAM (R)
                         m_nec = len(pcb_paginas_info[i])
                         ini_r = -1
                         for r in range(total_bloques - m_nec + 1):
@@ -196,7 +196,7 @@ while not salir:
                                 pcb_paginas_info[i][k]["marco"] = ini_r + k
                             pcb_ubicacion[i] = 'RAM'; pcb_estados[i] = 'R'
                         else: print(f"[AVISO] PID {pcb_pids[i]}: Sigue en VRAM, no cupo tras compactar.")
-                    else: # 40% Finaliza desde VRAM (E) [cite: 43]
+                    else: # 40% Finaliza desde VRAM (E)
                         print(f"[EVENTO] PID {pcb_pids[i]}: Finalizó (E) directamente desde VRAM.")
                         for pag in pcb_paginas_info[i]: lista_vram[pag["marco"]] = "-"
                         pcb_pids.pop(i); pcb_paginas_info.pop(i); pcb_ubicacion.pop(i); pcb_estados.pop(i)
