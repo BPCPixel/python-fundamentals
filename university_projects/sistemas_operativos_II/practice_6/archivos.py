@@ -1,3 +1,8 @@
+"""
+Autor: Lalo Téllez
+"""
+
+
 import random
 
 print(f'{"=" * 20} SimuFS: Gestión de Archivos {"=" * 20}')
