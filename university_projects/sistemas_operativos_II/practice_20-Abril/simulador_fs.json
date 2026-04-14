@@ -1,0 +1,22 @@
+{
+    "disco_maximo_bytes": 1048576000.0,
+    "disco_usado_bytes": 0,
+    "siguiente_bloque": 1,
+    "usuarios": {
+        "lalo": "1234"
+    },
+    "fs": {
+        "tipo": "dir",
+        "contenido": {
+            "home": {
+                "tipo": "dir",
+                "contenido": {
+                    "lalo": {
+                        "tipo": "dir",
+                        "contenido": {}
+                    }
+                }
+            }
+        }
+    }
+}
