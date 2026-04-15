@@ -14,7 +14,7 @@ C_RESET = '\033[0m'
 archivo_disco = "simulador_fs.json"
 tamano_bloque = 1024  # Cada bloque representará 1024 bytes (1 KB)
 
-print(f"{C_CYAN}=== INICIANDO SIMULADOR DE ARCHIVOS ===){C_RESET}")
+print(f"{C_CYAN}=== INICIANDO SIMULADOR DE ARCHIVOS ==={C_RESET}")
 print("1. Continuar donde lo dejé")
 print("2. Empezar desde cero (Formatear sistema)")
 opcion_inicio = input("Elige una opción (1/2): ")
@@ -33,7 +33,7 @@ else:
     if opcion_inicio == "1":
          print(f"{C_ROJO}No se encontró guardado previo. Creando sistema nuevo...{C_RESET}")
          
-    # Estructura base corregida (la raíz también tiene "contenido")
+    # Estructura base corregida
     sistema = {
         "disco_maximo_bytes": 0,
         "disco_usado_bytes": 0,
@@ -79,7 +79,7 @@ while usuario_actual == "":
         else:
             nuevo_pass = input("Contraseña: ")
             sistema["usuarios"][nuevo_usr] = nuevo_pass
-            # Crear su carpeta personal en /home (ruta corregida)
+            # Crear su carpeta personal en /home
             sistema["fs"]["contenido"]["home"]["contenido"][nuevo_usr] = {"tipo": "dir", "contenido": {}}
             print(f"{C_VERDE}Usuario {nuevo_usr} registrado con éxito.{C_RESET}")
             usuario_actual = nuevo_usr
@@ -97,10 +97,12 @@ while usuario_actual == "":
 ruta_actual = f"/home/{usuario_actual}"
 ejecutando = True
 
-print(f"\nBienvenido {C_VERDE}{usuario_actual}{C_RESET}. Escribe 'exit' para guardar y salir.")
+# Limpiamos la pantalla inicial para que el prompt arranque limpio
+os.system('cls' if os.name == 'nt' else 'clear')
+print(f"Bienvenido {C_VERDE}{usuario_actual}{C_RESET}. Escribe '{C_AMARILLO}help{C_RESET}' para ver los comandos o '{C_ROJO}exit{C_RESET}' para salir.")
 
 while ejecutando:
-    # 1. RESOLVER EL PUNTERO DEL DIRECTORIO ACTUAL (Evita el KeyError)
+    # 1. RESOLVER EL PUNTERO DEL DIRECTORIO ACTUAL
     dir_actual_dict = sistema["fs"]
     if ruta_actual != "/":
         partes_ruta = ruta_actual.strip("/").split("/")
@@ -125,11 +127,29 @@ while ejecutando:
         print(f"{C_AMARILLO}Cambios guardados. Apagando simulador...{C_RESET}")
         ejecutando = False
 
+    # --- COMANDO HELP ---
+    elif cmd == "help":
+        print(f"\n{C_CYAN}--- COMANDOS DISPONIBLES ---{C_RESET}")
+        print(f"  {C_VERDE}help{C_RESET}     - Muestra esta lista de comandos")
+        print(f"  {C_VERDE}clear{C_RESET}    - Limpia la pantalla de la terminal")
+        print(f"  {C_VERDE}pwd{C_RESET}      - Muestra la ruta del directorio actual")
+        print(f"  {C_VERDE}ls{C_RESET}       - Lista el contenido del directorio")
+        print(f"  {C_VERDE}cd{C_RESET}       - Cambia de directorio (ej: cd ruta, cd .. para regresar)")
+        print(f"  {C_VERDE}mkdir{C_RESET}    - Crea un nuevo directorio (ej: mkdir carpeta)")
+        print(f"  {C_VERDE}touch{C_RESET}    - Crea un archivo y simula asignación de memoria")
+        print(f"  {C_VERDE}rm/del{C_RESET}   - Elimina un archivo o directorio")
+        print(f"  {C_VERDE}chmod{C_RESET}    - Cambia permisos de un archivo (777 o 444)")
+        print(f"  {C_VERDE}exit{C_RESET}     - Guarda los cambios y sale del simulador\n")
+
+    # --- COMANDO CLEAR ---
+    elif cmd == "clear":
+        os.system('cls' if os.name == 'nt' else 'clear')
+
     # --- COMANDO PWD ---
     elif cmd == "pwd":
         print(ruta_actual)
 
-    # --- COMANDO LS (Con colores diferenciados) ---
+    # --- COMANDO LS ---
     elif cmd == "ls":
         for nombre, datos in dir_actual_dict["contenido"].items():
             if datos["tipo"] == "dir":
@@ -259,4 +279,4 @@ while ejecutando:
 
     # --- COMANDO DESCONOCIDO ---
     else:
-        print(f"{C_ROJO}Comando '{cmd}' no reconocido. Usa: ls, cd, pwd, mkdir, touch, del/rmdir, chmod, exit.{C_RESET}")
+        print(f"{C_ROJO}Comando '{cmd}' no reconocido. Usa 'help' para ver la lista de comandos.{C_RESET}")
