@@ -37,7 +37,7 @@ else:
         "disco_maximo_bytes": 0,
         "disco_usado_bytes": 0,
         "siguiente_bloque": 1,
-        "bloques_libres": [], # NUEVA LISTA PARA RECICLAJE
+        "bloques_libres": [],
         "usuarios": {},
         "fs": { 
             "tipo": "dir",
@@ -58,47 +58,51 @@ else:
         except ValueError:
             print(f"{C_ROJO}Por favor, ingresa un número válido.{C_RESET}")
 
-# --- SISTEMA DE LOGIN / REGISTRO ---
+# --- VARIABLES DE ESTADO ---
 usuario_actual = ""
-
-while usuario_actual == "":
-    print(f"\n{C_CYAN}--- ACCESO AL SISTEMA ---{C_RESET}")
-    if len(sistema["usuarios"]) == 0:
-        print("Registrar primer usuario (Admin).")
-        opcion_log = "2"
-    else:
-        print("1. Login")
-        print("2. Registrar nuevo usuario")
-        opcion_log = input("Elige una opción (1/2): ")
-
-    if opcion_log == "2":
-        nuevo_usr = input("Nuevo nombre de usuario: ")
-        if nuevo_usr in sistema["usuarios"]:
-            print(f"{C_ROJO}El usuario ya existe.{C_RESET}")
-        else:
-            nuevo_pass = input("Contraseña: ")
-            sistema["usuarios"][nuevo_usr] = nuevo_pass
-            sistema["fs"]["contenido"]["home"]["contenido"][nuevo_usr] = {"tipo": "dir", "contenido": {}}
-            print(f"{C_VERDE}Usuario {nuevo_usr} registrado con éxito.{C_RESET}")
-            usuario_actual = nuevo_usr
-            
-    elif opcion_log == "1":
-        usr = input("Usuario: ")
-        pwd = input("Contraseña: ")
-        if usr in sistema["usuarios"] and sistema["usuarios"][usr] == pwd:
-            print(f"{C_VERDE}Acceso concedido.{C_RESET}")
-            usuario_actual = usr
-        else:
-            print(f"{C_ROJO}Usuario o contraseña incorrectos.{C_RESET}")
-
-# --- PREPARACIÓN DEL ENTORNO ---
-ruta_actual = f"/home/{usuario_actual}"
+ruta_actual = ""
 ejecutando = True
 
-os.system('cls' if os.name == 'nt' else 'clear')
-print(f"Bienvenido {C_VERDE}{usuario_actual}{C_RESET}. Escribe '{C_AMARILLO}help{C_RESET}' para ver comandos.")
-
 while ejecutando:
+    # --- MENÚ DE LOGIN (Si no hay sesión iniciada) ---
+    if usuario_actual == "":
+        print(f"\n{C_CYAN}--- ACCESO AL SISTEMA ---{C_RESET}")
+        if len(sistema["usuarios"]) == 0:
+            print("Registrar primer usuario (Admin).")
+            opcion_log = "2"
+        else:
+            print("1. Login")
+            print("2. Registrar nuevo usuario")
+            opcion_log = input("Elige una opción (1/2): ")
+
+        if opcion_log == "2":
+            nuevo_usr = input("Nuevo nombre de usuario: ")
+            if nuevo_usr in sistema["usuarios"]:
+                print(f"{C_ROJO}El usuario ya existe.{C_RESET}")
+            else:
+                nuevo_pass = input("Contraseña: ")
+                sistema["usuarios"][nuevo_usr] = nuevo_pass
+                sistema["fs"]["contenido"]["home"]["contenido"][nuevo_usr] = {"tipo": "dir", "contenido": {}}
+                print(f"{C_VERDE}Usuario {nuevo_usr} registrado con éxito.{C_RESET}")
+                usuario_actual = nuevo_usr
+                ruta_actual = f"/home/{usuario_actual}"
+                os.system('cls' if os.name == 'nt' else 'clear')
+                print(f"Bienvenido {C_VERDE}{usuario_actual}{C_RESET}. Escribe 'help' para comandos.")
+                
+        elif opcion_log == "1":
+            usr = input("Usuario: ")
+            pwd = input("Contraseña: ")
+            if usr in sistema["usuarios"] and sistema["usuarios"][usr] == pwd:
+                print(f"{C_VERDE}Acceso concedido.{C_RESET}")
+                usuario_actual = usr
+                ruta_actual = f"/home/{usuario_actual}"
+                os.system('cls' if os.name == 'nt' else 'clear')
+                print(f"Bienvenido {C_VERDE}{usuario_actual}{C_RESET}. Escribe 'help' para comandos.")
+            else:
+                print(f"{C_ROJO}Usuario o contraseña incorrectos.{C_RESET}")
+        continue # Reinicia el ciclo para mostrar el prompt de la terminal
+
+    # --- LÓGICA DE LA TERMINAL ---
     dir_actual_dict = sistema["fs"]
     if ruta_actual != "/":
         partes_ruta = ruta_actual.strip("/").split("/")
@@ -115,37 +119,40 @@ while ejecutando:
     cmd = partes_cmd[0].lower()
     args = partes_cmd[1:]
 
-    # --- COMANDO EXIT ---
+    # --- COMANDOS DE SESIÓN Y SALIDA ---
     if cmd == "exit":
         with open(archivo_disco, "w") as f:
             json.dump(sistema, f, indent=4)
         print(f"{C_AMARILLO}Cambios guardados. Apagando simulador...{C_RESET}")
         ejecutando = False
 
-    # --- COMANDO HELP ---
+    elif cmd == "logout":
+        print(f"{C_AMARILLO}Cerrando sesión de {usuario_actual}...{C_RESET}")
+        usuario_actual = "" # Al limpiar esto, el ciclo nos llevará de nuevo al menú de login
+        ruta_actual = ""
+
+    # --- COMANDOS DE AYUDA Y PANTALLA ---
     elif cmd == "help":
         print(f"\n{C_CYAN}--- COMANDOS DISPONIBLES ---{C_RESET}")
         print(f"  {C_VERDE}help{C_RESET}     - Muestra esta lista de comandos")
         print(f"  {C_VERDE}clear{C_RESET}    - Limpia la pantalla de la terminal")
-        print(f"  {C_VERDE}pwd{C_RESET}      - Muestra la ruta del directorio actual")
-        print(f"  {C_VERDE}ls{C_RESET}       - Lista el contenido del directorio")
+        print(f"  {C_VERDE}logout{C_RESET}   - Cierra la sesión para cambiar de usuario")
+        print(f"  {C_VERDE}pwd{C_RESET}      - Muestra la ruta actual")
+        print(f"  {C_VERDE}ls{C_RESET}       - Lista el contenido")
         print(f"  {C_VERDE}cd{C_RESET}       - Cambia de directorio")
         print(f"  {C_VERDE}mkdir{C_RESET}    - Crea un nuevo directorio")
         print(f"  {C_VERDE}touch{C_RESET}    - Crea un archivo vacío (0 Bytes)")
-        print(f"  {C_VERDE}resize{C_RESET}   - Modifica el tamaño de un archivo y asigna bloques")
+        print(f"  {C_VERDE}resize{C_RESET}   - Cambia tamaño y asigna/recicla bloques")
         print(f"  {C_VERDE}rm/del{C_RESET}   - Elimina un archivo o directorio")
-        print(f"  {C_VERDE}chmod{C_RESET}    - Cambia permisos de un archivo (777 o 444)")
-        print(f"  {C_VERDE}exit{C_RESET}     - Guarda los cambios y sale\n")
+        print(f"  {C_VERDE}chmod{C_RESET}    - Cambia permisos (777 o 444)")
+        print(f"  {C_VERDE}exit{C_RESET}     - Guarda y sale del programa\n")
 
-    # --- COMANDO CLEAR ---
     elif cmd == "clear":
         os.system('cls' if os.name == 'nt' else 'clear')
 
-    # --- COMANDO PWD ---
     elif cmd == "pwd":
         print(ruta_actual)
 
-    # --- COMANDO LS ---
     elif cmd == "ls":
         for nombre, datos in dir_actual_dict["contenido"].items():
             if datos["tipo"] == "dir":
@@ -155,7 +162,6 @@ while ejecutando:
                 perm = datos.get("permisos", "777")
                 print(f"{C_BLANCO}{nombre}{C_RESET}\t{tam} Bytes\t{C_AMARILLO}[{perm}]{C_RESET}")
 
-    # --- COMANDO MKDIR ---
     elif cmd == "mkdir":
         if len(args) == 0:
             print(f"{C_ROJO}Error: Falta el nombre del directorio.{C_RESET}")
@@ -169,7 +175,6 @@ while ejecutando:
             else:
                 dir_actual_dict["contenido"][nombre_dir] = {"tipo": "dir", "contenido": {}}
 
-    # --- COMANDO TOUCH ---
     elif cmd == "touch":
         if len(args) == 0:
             print(f"{C_ROJO}Error: Falta el nombre del archivo.{C_RESET}")
@@ -179,15 +184,10 @@ while ejecutando:
                 print(f"{C_ROJO}Error: El archivo ya existe.{C_RESET}")
             else:
                 dir_actual_dict["contenido"][nombre_archivo] = {
-                    "tipo": "archivo",
-                    "tamano": 0,
-                    "bloques": [], 
-                    "permisos": "777",
-                    "propietario": usuario_actual
+                    "tipo": "archivo", "tamano": 0, "bloques": [], "permisos": "777", "propietario": usuario_actual
                 }
                 print(f"{C_VERDE}Archivo '{nombre_archivo}' creado (0 Bytes).{C_RESET}")
 
-    # --- COMANDO RESIZE (Con lógica de reciclaje) ---
     elif cmd == "resize":
         if len(args) < 2:
             print(f"{C_AMARILLO}Uso: resize [nombre_archivo] [tamano_en_bytes]{C_RESET}")
@@ -196,87 +196,73 @@ while ejecutando:
             try:
                 nuevo_tamano = int(args[1])
                 if nuevo_tamano < 0:
-                    print(f"{C_ROJO}Error: El tamaño no puede ser negativo.{C_RESET}")
+                    print(f"{C_ROJO}Error: Tamaño negativo.{C_RESET}")
                 elif nombre_archivo not in dir_actual_dict["contenido"]:
-                    print(f"{C_ROJO}Error: No existe ese archivo.{C_RESET}")
+                    print(f"{C_ROJO}Error: No existe el archivo.{C_RESET}")
                 else:
                     archivo = dir_actual_dict["contenido"][nombre_archivo]
                     if archivo["tipo"] != "archivo":
-                        print(f"{C_ROJO}Error: Solo puedes cambiar el tamaño de archivos.{C_RESET}")
+                        print(f"{C_ROJO}Error: Solo archivos.{C_RESET}")
                     elif archivo.get("permisos") == "444" and archivo.get("propietario") != "root":
-                        print(f"{C_ROJO}Error: Archivo protegido (Permisos 444).{C_RESET}")
+                        print(f"{C_ROJO}Error: Archivo protegido.{C_RESET}")
                     else:
                         tamano_anterior = archivo["tamano"]
                         diferencia_bytes = nuevo_tamano - tamano_anterior
-                        
                         if sistema["disco_usado_bytes"] + diferencia_bytes > sistema["disco_maximo_bytes"]:
-                            print(f"{C_ROJO}ERROR: Memoria insuficiente en el disco.{C_RESET}")
+                            print(f"{C_ROJO}ERROR: Memoria insuficiente.{C_RESET}")
                         else:
                             bloques_necesarios = math.ceil(nuevo_tamano / tamano_bloque)
                             bloques_actuales = len(archivo["bloques"])
-                            
-                            # Aumentar tamaño (Asignar bloques nuevos o reciclados)
                             if bloques_necesarios > bloques_actuales:
                                 for _ in range(bloques_necesarios - bloques_actuales):
                                     if len(sistema["bloques_libres"]) > 0:
-                                        # Usar el bloque reciclado más bajo
                                         archivo["bloques"].append(sistema["bloques_libres"].pop(0))
                                     else:
-                                        # Usar bloque nuevo
                                         archivo["bloques"].append(sistema["siguiente_bloque"])
                                         sistema["siguiente_bloque"] += 1
-                                        
-                            # Reducir tamaño (Liberar bloques al reciclaje)
                             elif bloques_necesarios < bloques_actuales:
-                                bloques_liberados = archivo["bloques"][bloques_necesarios:]
+                                sistema["bloques_libres"].extend(archivo["bloques"][bloques_necesarios:])
                                 archivo["bloques"] = archivo["bloques"][:bloques_necesarios]
-                                sistema["bloques_libres"].extend(bloques_liberados)
-                                sistema["bloques_libres"].sort() # Ordenar para usar los más bajos primero
-                                
+                                sistema["bloques_libres"].sort()
                             archivo["tamano"] = nuevo_tamano
                             sistema["disco_usado_bytes"] += diferencia_bytes
-                            print(f"{C_VERDE}Tamaño actualizado. Bloques asignados: {archivo['bloques']}{C_RESET}")
+                            print(f"{C_VERDE}Tamaño actualizado. Bloques: {archivo['bloques']}{C_RESET}")
             except ValueError:
-                print(f"{C_ROJO}Error: El tamaño debe ser un número entero.{C_RESET}")
+                print(f"{C_ROJO}Error: El tamaño debe ser un número.{C_RESET}")
 
-    # --- COMANDO RMDIR / DEL (Con lógica de reciclaje) ---
     elif cmd in ["rmdir", "del", "rm"]:
         if len(args) == 0:
             print(f"{C_ROJO}Error: Falta el nombre.{C_RESET}")
         else:
             nombre_obj = args[0]
             if nombre_obj not in dir_actual_dict["contenido"]:
-                print(f"{C_ROJO}Error: No existe ese archivo o directorio.{C_RESET}")
+                print(f"{C_ROJO}Error: No existe.{C_RESET}")
             else:
                 obj = dir_actual_dict["contenido"][nombre_obj]
                 if obj.get("permisos") == "444" and obj.get("propietario") != "root":
-                    print(f"{C_ROJO}Error: Archivo protegido (Permisos 444). Usa chmod.{C_RESET}")
+                    print(f"{C_ROJO}Error: Protegido.{C_RESET}")
                 else:
                     if obj["tipo"] == "archivo":
                         sistema["disco_usado_bytes"] -= obj["tamano"]
-                        # Enviar bloques liberados al reciclaje
                         sistema["bloques_libres"].extend(obj["bloques"])
-                        sistema["bloques_libres"].sort() # Ordenar para usar los más bajos primero
-                        
+                        sistema["bloques_libres"].sort()
                     del dir_actual_dict["contenido"][nombre_obj]
                     print(f"{C_VERDE}'{nombre_obj}' eliminado.{C_RESET}")
 
-    # --- COMANDO CHMOD ---
     elif cmd == "chmod":
         if len(args) < 2:
-            print(f"{C_AMARILLO}Uso: chmod [777 o 444] [nombre_archivo]{C_RESET}")
+            print(f"{C_AMARILLO}Uso: chmod [777 o 444] [archivo]{C_RESET}")
         else:
             permiso = args[0]
             nombre_obj = args[1]
             if permiso not in ["777", "444"]:
-                print(f"{C_ROJO}El simulador solo acepta 777 (Todo) o 444 (Solo lectura).{C_RESET}")
+                print(f"{C_ROJO}Solo 777 o 444.{C_RESET}")
             elif nombre_obj in dir_actual_dict["contenido"]:
                 dir_actual_dict["contenido"][nombre_obj]["permisos"] = permiso
-                print(f"{C_VERDE}Permisos de '{nombre_obj}' cambiados a {permiso}.{C_RESET}")
+                print(f"{C_VERDE}Permisos actualizados.{C_RESET}")
             else:
-                print(f"{C_ROJO}Archivo no encontrado.{C_RESET}")
+                print(f"{C_ROJO}No encontrado.{C_RESET}")
 
-    # --- COMANDO CD ---
     elif cmd == "cd":
         if len(args) == 0:
             ruta_actual = f"/home/{usuario_actual}"
@@ -286,32 +272,19 @@ while ejecutando:
                 if ruta_actual != "/":
                     partes = ruta_actual.strip("/").split("/")
                     partes.pop()
-                    if len(partes) == 0:
-                        ruta_actual = "/"
-                    else:
-                        ruta_actual = "/" + "/".join(partes)
+                    ruta_actual = "/" if not partes else "/" + "/".join(partes)
             else:
                 sub_partes = destino.split("/")
-                ruta_temporal = ruta_actual
-                dir_temporal_dict = dir_actual_dict
-                error = False
-                
+                ruta_temp, dir_temp, error = ruta_actual, dir_actual_dict, False
                 for p in sub_partes:
-                    if p == "": continue
-                    if p in dir_temporal_dict["contenido"] and dir_temporal_dict["contenido"][p]["tipo"] == "dir":
-                        dir_temporal_dict = dir_temporal_dict["contenido"][p]
-                        if ruta_temporal == "/":
-                            ruta_temporal = f"/{p}"
-                        else:
-                            ruta_temporal = f"{ruta_temporal}/{p}"
+                    if not p: continue
+                    if p in dir_temp["contenido"] and dir_temp["contenido"][p]["tipo"] == "dir":
+                        dir_temp = dir_temp["contenido"][p]
+                        ruta_temp = f"/{p}" if ruta_temp == "/" else f"{ruta_temp}/{p}"
                     else:
-                        print(f"{C_ROJO}Error: La ruta '{p}' no existe o no es un directorio.{C_RESET}")
+                        print(f"{C_ROJO}Ruta '{p}' no válida.{C_RESET}")
                         error = True
                         break
-                
-                if not error:
-                    ruta_actual = ruta_temporal
-
-    # --- COMANDO DESCONOCIDO ---
+                if not error: ruta_actual = ruta_temp
     else:
-        print(f"{C_ROJO}Comando '{cmd}' no reconocido. Usa 'help' para ver la lista de comandos.{C_RESET}")
+        print(f"{C_ROJO}Comando desconocido. Usa 'help'.{C_RESET}")
